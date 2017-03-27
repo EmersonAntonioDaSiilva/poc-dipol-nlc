@@ -14,13 +14,7 @@ var natural_language_classifier = new NaturalLanguageClassifierV1({
 
 app.get('/addUser', function (req, res) {
     var classifier_id = req.param('classifier_id');
-    console.log('classifier_id:', classifier_id);
-
     var texto = req.param('texto');
-    console.log('texto:', texto);
-
-    //var classifier_id = '90e7acx197-nlc-4352';
-    //var texto = 'Test de roubo';
 
     natural_language_classifier.classify({
       text: texto,
@@ -30,7 +24,13 @@ app.get('/addUser', function (req, res) {
           res.send(err);         
           console.log('error:', err);
         } else {
-          res.send(JSON.stringify(response, null, 2));         
+
+          var classes_0 = response.classes[0].class_name;
+          console.log('classes_0:', classes_0);
+          var classes_1 = response.classes[1].class_name;
+          console.log('classes_1:', classes_1);
+
+          res.send(classes_0 + ',' + classes_1);         
           console.log(JSON.stringify(response, null, 2));
         }
     });

@@ -1,0 +1,8 @@
+applications:
+- path: .
+  memory: 256M
+  instances: 1
+  domain: mybluemix.net
+  name: poc-dipol-nlc
+  host: poc-dipol-nlc
+  disk_quota: 1024M

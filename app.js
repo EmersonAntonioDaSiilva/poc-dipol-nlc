@@ -28,7 +28,8 @@ app.get('/nlcDipol', function (req, res) {
       classifier_id: classifier_id },
       function(err, response) {
         if (err) {
-          res.send(err);         
+          
+          res.send('MO não encontrado!');         
           console.log('error:', err);
         } else {
 

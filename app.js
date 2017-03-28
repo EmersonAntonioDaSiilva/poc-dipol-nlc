@@ -21,7 +21,15 @@ var natural_language_classifier = new NaturalLanguageClassifierV1({
 
 app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
     var classifier_id = req.params.classifier_id;
-    var texto = req.params.texto;
+    var textofatiado = req.params.texto.split('&amp;texto=');
+    var classesRetorno = [];
+    var texto;
+
+    for (let letTexto in textofatiado) {
+      if(letTexto.length > 0){
+        texto = letTexto;
+      }
+    };
 
     natural_language_classifier.classify({
       text: texto,
@@ -38,17 +46,20 @@ app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
           var classes_1 = response.classes[1].class_name;
           var confidence_1 = response.classes[1].confidence;
 
-
           var classes = [];
 
           classes.push({class_name: classes_0, confidence: confidence_0});
           classes.push({class_name: classes_1, confidence: confidence_1});
-
           result.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
-          res.send(classes_0 + ',' + classes_1);         
+          classesRetorno.push(classes_0);
+          classesRetorno.push(classes_1);
+
+          res.contentType('application/json');
+          res.send(JSON.stringify(classesRetorno));
         }
     });
+
 });
 
 

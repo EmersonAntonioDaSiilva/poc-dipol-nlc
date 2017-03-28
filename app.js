@@ -1,6 +1,7 @@
 var express = require('express');
 var cfenv = require('cfenv');
 var app = express();
+var result = [];
 
 const fs = require('fs');
 var NaturalLanguageClassifierV1 = require('watson-developer-cloud/natural-language-classifier/v1');
@@ -12,9 +13,9 @@ var natural_language_classifier = new NaturalLanguageClassifierV1({
 });
 
 
-app.get('/addUser', function (req, res) {
-    var classifier_id = req.param('classifier_id');
-    var texto = req.param('texto');
+app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
+    var classifier_id = req.params.classifier_id;
+    var texto = req.params.texto;
 
     natural_language_classifier.classify({
       text: texto,
@@ -26,14 +27,27 @@ app.get('/addUser', function (req, res) {
         } else {
 
           var classes_0 = response.classes[0].class_name;
-          console.log('classes_0:', classes_0);
+          var confidence_0 = response.classes[0].confidence;
           var classes_1 = response.classes[1].class_name;
-          console.log('classes_1:', classes_1);
+          var confidence_1 = response.classes[1].confidence;
+
+
+          var classes = [];
+
+          classes.push({class_name: classes_0, confidence: confidence_0});
+          classes.push({class_name: classes_1, confidence: confidence_1});
+
+          result.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
           res.send(classes_0 + ',' + classes_1);         
-          console.log(JSON.stringify(response, null, 2));
         }
     });
+});
+
+
+app.get('/listResult', function (req, res) {
+  res.contentType('application/json');
+  res.send(JSON.stringify(result));
 });
 
 app.use(express.static(__dirname + '/public'));

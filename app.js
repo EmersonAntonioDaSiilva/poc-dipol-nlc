@@ -13,9 +13,15 @@ var natural_language_classifier = new NaturalLanguageClassifierV1({
 });
 
 
-app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
-    var classifier_id = req.params.classifier_id;
-    var texto = req.params.texto;
+// O adequado seria desta Performance
+// app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
+//    var classifier_id = req.params.classifier_id;
+//     var texto = req.params.texto;
+
+
+app.get('/nlcDipol', function (req, res) {
+    var classifier_id = req.param('classifier_id');
+    var texto = req.param('texto');
 
     natural_language_classifier.classify({
       text: texto,

@@ -18,7 +18,7 @@ app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
     var classifier_id = req.params.classifier_id;
     var textofatiado = req.params.texto.split('&amp;texto=');
 
-    let promises = [];
+    var promises = [];
     textofatiado.forEach(function (texto) {
       if(texto.length > 0){
         promises.push(new Promise(function(resolve, reject) {

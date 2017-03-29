@@ -12,55 +12,59 @@ var natural_language_classifier = new NaturalLanguageClassifierV1({
   version: 'v1'
 });
 
-
-// O adequado seria desta Performance
-// app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
-//    var classifier_id = req.params.classifier_id;
-//     var texto = req.params.texto;
-
-
 app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
     res.contentType('application/json');
     
     var classifier_id = req.params.classifier_id;
     var textofatiado = req.params.texto.split('&amp;texto=');
-    var classesRetorno = [];
-    var texto = "";
 
-    textofatiado.forEach(function (letTexto) {
-      if(letTexto.length > 0){
-        texto = letTexto;
-      }
-    })
+    let promises = [];
+    textofatiado.forEach(function (texto) {
+      if(texto.length > 0){
+        promises.push(new Promise(function(resolve, reject) {
+          var envio = {text: texto, classifier_id: classifier_id };
+          natural_language_classifier.classify(envio,
+            function(err, response) {
+              if (err) {
+                console.log('error:', err);
+                reject(err);     
+                
+              } else {
+                var classes_0 = response.classes[0].class_name;
+                var confidence_0 = response.classes[0].confidence;
+                var classes_1 = response.classes[1].class_name;
+                var confidence_1 = response.classes[1].confidence;
 
-    natural_language_classifier.classify({
-      text: texto,
-      classifier_id: classifier_id },
-      function(err, response) {
-        if (err) {
+                var classes = [];
+
+                classes.push({class_name: classes_0, confidence: confidence_0});
+                classes.push({class_name: classes_1, confidence: confidence_1});
           
-          res.send('MO não encontrado!');         
-          console.log('error:', err);
-        } else {
+                result.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
-          var classes_0 = response.classes[0].class_name;
-          var confidence_0 = response.classes[0].confidence;
-          var classes_1 = response.classes[1].class_name;
-          var confidence_1 = response.classes[1].confidence;
-
-          var classes = [];
-
-          classes.push({class_name: classes_0, confidence: confidence_0});
-          classes.push({class_name: classes_1, confidence: confidence_1});
-    
-          result.push({classifier_id: classifier_id, texto: texto, classes: classes});
-
-          classesRetorno.push(classes_0);
-          classesRetorno.push(classes_1);
-
-          res.send(JSON.stringify(classesRetorno));
-        }
+                resolve(classes);
+              };
+          });
+        }))};
     });
+
+    Promise.all(promises)
+      .then(function(results){
+        var retorno = [];
+
+        results.forEach(function (array) {
+          array.forEach(function (subArray) {
+            if(retorno.indexOf(subArray) === -1){
+              retorno.push(subArray.class_name);
+            }
+          })
+        })
+
+        res.send(JSON.stringify(retorno));
+      }).catch(function(errs) {
+        res.send('MO não encontrado!');
+      });
+
 });
 
 
@@ -73,10 +77,6 @@ app.use(express.static(__dirname + '/public'));
 
 var appEnv = cfenv.getAppEnv();
 
-// start server on the specified port and binding host
 app.listen(appEnv.port, '0.0.0.0', function() {
-  // print a message when the server starts listening
-
-
   console.log("server starting on " + appEnv.url);
 });

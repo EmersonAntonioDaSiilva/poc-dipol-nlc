@@ -27,11 +27,11 @@ app.get('/nlcDipol/:classifier_id/:texto', function (req, res) {
     var classesRetorno = [];
     var texto = "";
 
-    for (let letTexto in textofatiado) {
+    textofatiado.forEach(function (letTexto) {
       if(letTexto.length > 0){
         texto = letTexto;
       }
-    };
+    })
 
     natural_language_classifier.classify({
       text: texto,

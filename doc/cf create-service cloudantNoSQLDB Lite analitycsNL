@@ -1,0 +1,6 @@
+cf create-service cloudantNoSQLDB Lite analitycsNLCDipoldb
+cf bind-service poc-dipol-nlc analitycsNLCDipoldb
+cf restage poc-dipol-nlc
+cf env poc-dipol-nlc
+
+node startDatabase.js

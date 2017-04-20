@@ -1,4 +1,4 @@
-var nano = require('nano')('https://6fb9d344-3e7c-48f1-845d-ef672216af56-bluemix:3b70c7a9d7bbbfd587b744851f61edb3f105da99ca76bcfad05825ed58c03841@6fb9d344-3e7c-48f1-845d-ef672216af56-bluemix.cloudant.com');
+var nano = require('nano')('https://ab46cb82-f091-4fea-b622-11049ed033af-bluemix:9c25511ba5185fde1746a9f31bd8b351c75510b7c8aca12c9ccf3c5bc14c0f2e@ab46cb82-f091-4fea-b622-11049ed033af-bluemix.cloudant.com');
 
 // clean up the database we created previousl
 nano.db.destroy('prints', function() {
@@ -7,7 +7,7 @@ nano.db.destroy('prints', function() {
     // specify the database we are going to use
     var prints = nano.use('prints');
     // and insert a document in it
-    prints.insert({ 'landscapes': [
+    prints.insert({ 'poc-dipol-nlc': [
   {
     "classifier_id": "90e7b7x198-nlc-4946",
     "texto": ", na mao e mediante grave ameaça lhe subtrairam o veículo.",
@@ -36,7 +36,7 @@ nano.db.destroy('prints', function() {
       }
     ]
   }
-]}, 'inventory', function(err, body, header) {
+]}, 'poc-dipol', function(err, body, header) {
       if (err) {
         console.log('Error creating document - ', err.message);
         return;

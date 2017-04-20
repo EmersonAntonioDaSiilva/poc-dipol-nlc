@@ -2,7 +2,7 @@ var express = require('express');
 var cfenv = require('cfenv');
 
 var appEnv = cfenv.getAppEnv();
-var dbCreds =  appEnv.getServiceCreds('analitycsNLCDipoldb');
+var dbCreds =  appEnv.getServiceCreds('analitycsNLCdb');
 
 var nano, prints;
 
@@ -50,6 +50,7 @@ app.post('/postNlcDipol', function (req, res) {
                 var confidence_0 = response.classes[0].confidence;
                 var classes_1 = response.classes[1].class_name;
                 var confidence_1 = response.classes[1].confidence;
+                var longDate = new DateTime();
 
                 var classes = [];
 
@@ -60,7 +61,7 @@ app.post('/postNlcDipol', function (req, res) {
                 var retorno = [];
                 retorno.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
-                prints.insert({ 'dados': retorno}, classes_0 + '_' + result.length, function(err, body, header) {
+                prints.insert({ 'dados': retorno}, "poc-dipol_" + result.length + '_' + longDate, function(err, body, header) {
                       if (err) {
                         console.log('Error creating document - ', err.message);
                         return;

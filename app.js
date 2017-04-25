@@ -30,13 +30,38 @@ var natural_language_classifier = new NaturalLanguageClassifierV1({
 var bodyParser = require('body-parser');
 app.use(bodyParser.json({ type: 'application/json' }));
 
+const gravarDados = function(retorno) {
+  if (dbCreds) {
+    prints.insert({ 'poc-dipol': retorno}, 'poc-dipol_' + result.length, function(err, body, header) {
+      if (err) {
+        console.log('Error creating document - ', err.message);
+        return;
+      }
+      console.log('all records inserted.')
+      console.log(body);
+    });
+  } else {
+    console.log('NO DB!');
+  }
+};
+
+
 app.post('/postNlcDipol', function (req, res) {  
+    console.log("==== Retorno: " + JSON.stringify(req.body));
+    
     var classifier_id = req.body.cl;
-    var textofatiado = req.body.texto.split('tx=');
+    console.log("==== classifier_id: " + classifier_id);
+    
+    var texto = req.body.texto;
+    console.log("==== texto: " + texto);
+
+    var textofatiado = texto.split('tx=');
+    console.log("==== textofatiado: " + textofatiado);
+
     var promises = [];
 
     textofatiado.forEach(function (texto) {
-      if(texto.length > 5){
+      if(texto.length > 4){
         promises.push(new Promise(function(resolve, reject) {
           var envio = {text: texto, classifier_id: classifier_id };
           natural_language_classifier.classify(envio,
@@ -60,14 +85,7 @@ app.post('/postNlcDipol', function (req, res) {
                 var retorno = [];
                 retorno.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
-                prints.insert({ 'poc-dipol': retorno}, "poc-dipol_" + result.length, function(err, body, header) {
-                      if (err) {
-                        console.log('Error creating document - ', err.message);
-                        return;
-                      }
-                      console.log('all records inserted.')
-                      console.log(body);
-                    });
+                gravarDados(retorno);
 
                 resolve(classes);
               };
@@ -77,17 +95,24 @@ app.post('/postNlcDipol', function (req, res) {
 
     Promise.all(promises)
       .then(function(results){
-        var retorno = [];
+        var retorno = '';
+
+        console.log("results = = " + results);
 
         results.forEach(function (array) {
+          console.log("array = = " + array);
+
           array.forEach(function (subArray) {
-            if(retorno.indexOf(subArray) === -1){
-              if(retorno.length === 0){
+            console.log("subArray = = " + subArray.class_name);
+          
+              if(retorno.length == 0){
                 retorno = subArray.class_name;
               } else {
-                retorno = retorno + ',' + subArray.class_name;
+                if(retorno.indexOf(subArray.class_name) <= 0){
+                  retorno = retorno + ',' + subArray.class_name;
+                }
               }
-            }
+                console.log("retorno = = " + retorno);
           })
         })
 
@@ -129,15 +154,7 @@ app.get('/getNlcDipol/:cl/:tx', function (req, res) {
                 var retorno = [];
                 retorno.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
-                prints.insert({ 'dados': retorno}, classes_0 + '_' + result.length, function(err, body, header) {
-                      if (err) {
-                        console.log('Error creating document - ', err.message);
-                        return;
-                      }
-                      console.log('all records inserted.')
-                      console.log(body);
-                    });
-
+                gravarDados(retorno);
 
                 resolve(classes);
               };
@@ -197,15 +214,7 @@ app.get('/nlcDipol', function (req, res) {
             var retorno = [];
             retorno.push({classifier_id: classifier_id, texto: texto, classes: classes});
 
-            prints.insert({ 'dados': retorno}, classes_0 + '_' + result.length, function(err, body, header) {
-                  if (err) {
-                    console.log('Error creating document - ', err.message);
-                    return;
-                  }
-                  console.log('all records inserted.')
-                  console.log(body);
-                });
-
+            gravarDados(retorno);
 
             resolve(classes);
           };
